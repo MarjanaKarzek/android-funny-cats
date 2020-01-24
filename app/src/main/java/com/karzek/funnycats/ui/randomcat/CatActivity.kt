@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProviders
 import com.karzek.funnycats.R
 import com.karzek.funnycats.common.extension.doOnIoObserveOnMain
-import com.karzek.funnycats.ui.FunnyCatsApplication
 import com.karzek.funnycats.ui.common.base.BaseActivity
 import io.reactivex.Single
 import io.reactivex.rxkotlin.addTo
@@ -23,7 +22,6 @@ class CatActivity : BaseActivity(R.layout.activity_cat) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FunnyCatsApplication.get().components.getRandomCatComponent().inject(this)
 
         viewModel = ViewModelProviders.of(this).get(CatViewModel::class.java)
 
