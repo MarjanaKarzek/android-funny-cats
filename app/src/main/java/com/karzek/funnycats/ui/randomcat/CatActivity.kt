@@ -35,15 +35,13 @@ class CatActivity : BaseActivity(R.layout.activity_cat) {
     private fun setupLoadingListener() {
         viewModel.loading
             .doOnIoObserveOnMain()
-            .subscribeBy(onNext = {
+            .subscribeBy {
                 if (it) {
                     progress_overlay.visibility = View.VISIBLE
                 } else {
                     progress_overlay.visibility = View.GONE
                 }
-            }, onError = {
-                it.printStackTrace()
-            })
+            }
             .addTo(compositeDisposable)
     }
 
@@ -56,24 +54,20 @@ class CatActivity : BaseActivity(R.layout.activity_cat) {
     private fun setupCatImageListener() {
         viewModel.catImage
             .doOnIoObserveOnMain()
-            .subscribeBy(onNext = {
+            .subscribeBy {
                 loadImageFromUrl(it.url)
-            }, onError = {
-                it.printStackTrace()
-            })
+            }
             .addTo(compositeDisposable)
     }
 
     private fun setupTokenAvailabilityListener() {
         viewModel.tokenAvailable
             .doOnIoObserveOnMain()
-            .subscribeBy(onNext = {
+            .subscribeBy {
                 if (!it) {
                     showEnterTokenDialog()
                 }
-            }, onError = {
-                it.printStackTrace()
-            })
+            }
             .addTo(compositeDisposable)
     }
 
