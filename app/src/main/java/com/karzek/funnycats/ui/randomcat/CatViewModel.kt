@@ -2,7 +2,6 @@ package com.karzek.funnycats.ui.randomcat
 
 import com.karzek.funnycats.common.extension.doOnIoObserveOnMain
 import com.karzek.funnycats.domain.cat.GetRandomCatUseCase
-import com.karzek.funnycats.domain.cat.GetRandomCatUseCase.Input
 import com.karzek.funnycats.domain.common.error.Errors
 import com.karzek.funnycats.domain.model.CatImage
 import com.karzek.funnycats.domain.token.IsApiTokenAvailableUseCase
@@ -11,7 +10,7 @@ import com.karzek.funnycats.ui.FunnyCatsApplication
 import com.karzek.funnycats.ui.common.base.BaseViewModel
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
 class CatViewModel : BaseViewModel() {
@@ -23,10 +22,8 @@ class CatViewModel : BaseViewModel() {
     @Inject
     lateinit var updateApiTokenUseCase: UpdateApiTokenUseCase
 
-    val errorState = PublishSubject.create<Errors>()
-    val tokenAvailable = PublishSubject.create<Boolean>()
-    val loading = PublishSubject.create<Boolean>()
-    val catImage = PublishSubject.create<CatImage>()
+    val tokenAvailable = BehaviorSubject.create<Boolean>()
+    val catImage = BehaviorSubject.create<CatImage>()
 
     init {
         FunnyCatsApplication.get().components.getRandomCatComponent().inject(this)
@@ -34,7 +31,7 @@ class CatViewModel : BaseViewModel() {
     }
 
     fun getRandomCatImage() {
-        getRandomCatUseCase.execute(Input())
+        getRandomCatUseCase.execute(GetRandomCatUseCase.Input())
             .doOnIoObserveOnMain()
             .doOnSubscribe { loading.onNext(true) }
             .subscribeBy {
@@ -54,7 +51,7 @@ class CatViewModel : BaseViewModel() {
             .subscribeBy {
                 if (it is IsApiTokenAvailableUseCase.Output.Success) {
                     tokenAvailable.onNext(it.available)
-                    if(it.available) {
+                    if (it.available) {
                         getRandomCatImage()
                     }
                 } else {
@@ -62,12 +59,6 @@ class CatViewModel : BaseViewModel() {
                 }
             }
             .addTo(compositeDisposable)
-
-    }
-
-    override fun onCleared() {
-        compositeDisposable.clear()
-        super.onCleared()
     }
 
     fun setToken(token: String) {
